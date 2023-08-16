@@ -71,6 +71,14 @@ class BinModel(nn.Module):
             if acc > best_acc:
                 best_acc = acc
                 best_weights = copy.deepcopy(model.state_dict())
+            
+            loss_pred = loss_fn(y_pred.view(-1, 1).float(), y_val)
+            acc_pred = acc
+            f1_pred =  metric(y_pred, y_val)
+            writer.add_scalar(f'loss/test/fold{fold}/weight{weight_value}', loss_pred, epoch)
+            writer.add_scalar(f'acc/test/fold{fold}/weight{weight_value}', acc_pred, epoch)
+            writer.add_scalar(f'f1/test/fold{fold}/weight{weight_value}', f1_pred, epoch)
         # restore model and return best accuracy
+        # f1 = metric(y_pred, y_val)
         model.load_state_dict(best_weights)
-        return best_acc
+        return best_acc, f1
